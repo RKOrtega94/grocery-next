@@ -1,0 +1,54 @@
+model users {
+    id         String       @id @default(uuid())
+    email      String       @unique
+    password   String
+    phone      String
+    status     status       @default(INACTIVE)
+    createdAt  DateTime     @default(now())
+    updatedAt  DateTime     @updatedAt
+    deletedAt  DateTime?
+    user_roles user_roles[]
+}
+
+model roles {
+    id         String       @id @default(uuid())
+    name       String       @unique
+    status     status       @default(INACTIVE)
+    createdAt  DateTime     @default(now())
+    updatedAt  DateTime     @updatedAt
+    deletedAt  DateTime?
+    user_roles user_roles[]
+}
+
+model user_roles {
+    user   users  @relation(fields: [userId], references: [id])
+    userId String
+    role   roles  @relation(fields: [roleId], references: [id])
+    roleId String
+
+    @@id([userId, roleId])
+}
+
+model permissions {
+    id                 String               @id @default(uuid())
+    name               String               @unique
+    status             status               @default(INACTIVE)
+    createdAt          DateTime             @default(now())
+    updatedAt          DateTime             @updatedAt
+    deletedAt          DateTime?
+    entity_permissions entity_permissions[]
+}
+
+enum entity {
+    USER
+    ROLE
+}
+
+model entity_permissions {
+    entity       entity
+    entityId     String
+    permission   permissions @relation(fields: [permissionId], references: [id])
+    permissionId String
+
+    @@id([entity, entityId, permissionId])
+}
