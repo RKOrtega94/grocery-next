@@ -1,15 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaClient } from "@prisma/client";
+import { Pagination } from "../interfaces/pagination.interface";
 
-let prisma: PrismaClient;
 
-if (process.env.NODE_ENV === "production") {
-  prisma = new PrismaClient();
-} else {
-  if (!(global as any).prisma) {
-    (global as any).prisma = new PrismaClient();
-  }
-  prisma = (global as any).prisma;
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+
+const prisma = globalForPrisma.prisma || new PrismaClient()
+
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma
+
+function buildPrismaPaginationOptions(pagination: Pagination) {
+  return {
+    skip: ((pagination.page ?? 1) - 1) * (pagination.limit ?? 10),
+    take: pagination.limit,
+    orderBy: {
+      [pagination.sortBy ?? "id"]: pagination.sort ?? "asc",
+    },
+  };
 }
 
-export default prisma;
+export { prisma, buildPrismaPaginationOptions };

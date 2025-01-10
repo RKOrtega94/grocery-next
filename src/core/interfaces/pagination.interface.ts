@@ -4,8 +4,8 @@ export enum sort {
 }
 
 export interface Pagination {
-  page: number;
-  limit: number;
-  sort: sort;
-  sortBy: string;
+  page?: number;
+  limit?: number;
+  sort?: sort;
+  sortBy?: string;
 }
